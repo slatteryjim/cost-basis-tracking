@@ -72,6 +72,19 @@ func (l *Ledger) Purchase(date time.Time, fromLotName string, toAccount Account,
 	return newLot
 }
 
+// Purchase represents an exchange of
+func (l *Ledger) Fee(date time.Time, fromLotName string, currency Currency, amount float64, applyFeeToCostBasisOfLot string) {
+	// find the given lot
+	feePaidFromLot := l.FindLotByName(fromLotName, currency)
+
+	// TODO: could also model the feePaidFromAmount as a "sale" for localCurrency, and then record that as capital gains, and
+	// add it to some other lot's cost basis. But the amounts are pretty small, so going to skip over that for now.
+	feeCostBasis := feePaidFromLot.Remove(currency, amount)
+
+	feeAppliedToLot := l.findLotByName(applyFeeToCostBasisOfLot)
+	feeAppliedToLot.costBasis += feeCostBasis
+}
+
 // Transfer removes the given amount from the existing lot, and transfers it to a new account (minus the given fee).
 // The new lot has the reduced amount, but preserves the original cost basis.
 func (l *Ledger) Transfer(date time.Time, fromLotName string, currency Currency, amountRemoved, feePaidFromAmount float64, toAccount Account) *Lot {
@@ -313,14 +326,19 @@ func (l *Ledger) MergeIdenticalLots(purchaseDate time.Time, currency Currency, l
 
 // FindLotByName finds the lot with the given name, or panics.
 func (l *Ledger) FindLotByName(name string, currency Currency) *Lot {
+	lot := l.findLotByName(name)
+	if lot.currency != currency {
+		panic("Lot does not contain " + currency.String() + "\n" + lot.String())
+	}
+	return lot
+}
+
+func (l *Ledger) findLotByName(name string) *Lot {
 	// lot name is reused when lot is updated
 	// so search through lots in reverse order, returning the first match we encounter
 	for i := len(l.lots) - 1; i >= 0; i-- {
 		lot := l.lots[i]
 		if lot.name == name {
-			if lot.currency != currency {
-				panic("Lot does not contain " + currency.String() + "\n" + lot.String())
-			}
 			return lot
 		}
 	}

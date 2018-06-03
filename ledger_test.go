@@ -89,7 +89,7 @@ func TestLargerScenario(t *testing.T) {
 1.3    2017-04-06 Bitfinex DASH 0.000000000  (basis:$0.000000    price:$NaN)
 2      2017-08-01 Bitfinex BCH 0.000000000   (basis:$0.000000    price:$NaN)
 3      2017-10-23 Bitfinex BTG 0.000000000   (basis:$0.000000    price:$NaN)
-1.1.1  2017-04-06 Coinbase BTC 0.418883380   (basis:$570.020573  price:$1360.809715)
+1.1.1  2017-04-06 Coinbase BTC 0.418873380   (basis:$570.020573  price:$1360.842202)
 1.2.1  2017-04-06 Coinbase ETH 9.190000000   (basis:$258.054818  price:$28.079958)
 1.3.1  2017-11-02 Bitfinex BTC 0.000000000   (basis:$0.000000    price:$NaN)
 1.3.2  2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
@@ -114,8 +114,8 @@ func TestLargerScenario(t *testing.T) {
 
 === Account balances (and their lots): ===
 Coinbase
-	BTC 0.602915590 (basis:1854.377672	price:$3075.683732)
-		1.1.1  2017-04-06 Coinbase BTC 0.418883380  (basis:$570.020573   price:$1360.809715)
+	BTC 0.602905590 (basis:1854.377672	price:$3075.734746)
+		1.1.1  2017-04-06 Coinbase BTC 0.418873380  (basis:$570.020573   price:$1360.842202)
 		4.1    2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.357099  price:$6978.979923)
 	ETH 9.190000000 (basis:258.054818	price:$28.079958)
 		1.2.1  2017-04-06 Coinbase ETH 9.190000000  (basis:$258.054818  price:$28.079958)
@@ -176,6 +176,9 @@ func largerScenario(w io.Writer) {
 
 	// 11/2 Transfer BTC from Bitfinex to Coinbase
 	l.Transfer(d("2017-11-01"), "4", BTC, 0.18453221, 0.0005, Coinbase)
+
+	// 12/1 Invent some random fee
+	l.Fee(d("2017-12-01"), "1.1.1", BTC, 0.00001, "1.1.1")
 
 	//
 	// Print results
