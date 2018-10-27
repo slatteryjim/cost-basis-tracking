@@ -252,8 +252,8 @@ func (l *Ledger) ExchangeTaxableMultipleLots(date time.Time, fromLotNames []stri
 		l.ExchangeTaxable(date, lot.name, soldCurrency, amountToSellFromLot, 0, lookupSoldCurrencyPriceForTaxableGains, purchasedCurrency, purchasePortion)
 	}
 
-	if RoundPlaces(remainingToSell, 12) != 0 || RoundPlaces(remainingToPurchase, 12) != 0 {
-		panic(fmt.Sprintf("Incorrect funds sold/purchased. Remaining: sell %.9f, purchase %.9f", remainingToSell, remainingToPurchase))
+	if RoundPlaces(remainingToSell, 11) != 0 || RoundPlaces(remainingToPurchase, 11) != 0 {
+		panic(fmt.Sprintf("Incorrect funds sold/purchased. Remaining: sell %.13f, purchase %.13f", remainingToSell, remainingToPurchase))
 	}
 }
 
