@@ -53,8 +53,7 @@ func TestSimpleScenario(t *testing.T) {
 1.1.1  2017-04-06 Coinbase BTC 0.799000000  (basis:$1033.620311  price:$1293.642441)
 
 === Capital Gains: ===
-(total short-term gains: $0.00)
-(total long-term gains:  $0.00)
+(Total capital gains: short-term:$0.00 long-term:$0.00)
 
 === Account balances (and their lots): ===
 Bitfinex
@@ -109,8 +108,8 @@ func TestLargerScenario(t *testing.T) {
 1.3.2	2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
 2.2	2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
 3.2	2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
-(total short-term gains: $757.80)
-(total long-term gains:  $0.00)
+(2017's capital gains: short-term:$757.80 long-term:$0.00)
+(Total capital gains: short-term:$757.80 long-term:$0.00)
 
 === Account balances (and their lots): ===
 Coinbase

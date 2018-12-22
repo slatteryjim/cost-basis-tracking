@@ -408,20 +408,42 @@ func (l *Ledger) PrintIncome() string {
 // In the future will probably want to restrict the date ranges, e.g. to a single calendar year.
 func (l *Ledger) PrintTaxableGains() string {
 	b := &bytes.Buffer{}
-	var totalShortTerm, totalLongTerm float64
+
+	var (
+		totalShortTerm, totalLongTerm float64
+
+		shortTermByYear = map[int]float64{}
+		longTermByYear  = map[int]float64{}
+	)
 	for _, lot := range l.lots {
 		if lot.lotType == TaxableGains {
-			details := lot.taxableGainsDetails
+			var (
+				details = lot.taxableGainsDetails
+				gain    = details.gains
+				year    = lot.originalPurchaseTime.Year()
+			)
+
 			if details.isLongTerm {
-				totalLongTerm += details.gains
+				totalLongTerm += gain
+				longTermByYear[year] += gain
 			} else {
-				totalShortTerm += details.gains
+				totalShortTerm += gain
+				shortTermByYear[year] += gain
 			}
 			fmt.Fprintln(b, lot)
 		}
 	}
-	fmt.Fprintf(b, "(total short-term gains: $%.2f)\n", totalShortTerm)
-	fmt.Fprintf(b, "(total long-term gains:  $%.2f)\n", totalLongTerm)
+
+	var years []int
+	for y := range shortTermByYear {
+		years = append(years, y)
+	}
+	sort.Ints(years)
+	for _, y := range years {
+		fmt.Fprintf(b, "(%d's capital gains: short-term:$%.2f long-term:$%.2f)\n", y, shortTermByYear[y], longTermByYear[y])
+	}
+	fmt.Fprintf(b, "(Total capital gains: short-term:$%.2f long-term:$%.2f)\n", totalShortTerm, totalLongTerm)
+
 	return b.String()
 }
 
