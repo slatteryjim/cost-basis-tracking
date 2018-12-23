@@ -2,6 +2,7 @@ package ledger
 
 import (
 	"bytes"
+	"encoding/csv"
 	"fmt"
 	"math"
 	"os"
@@ -519,6 +520,57 @@ func (l *Ledger) AccountSummary() map[Account]map[Currency]*Summary {
 		}
 	}
 	return accounts
+}
+
+// PrintPresentValueTSV will display information on the active lots,
+// including their present value based on the currentPrices provided.
+// Printed as tab-separated values, suitable for pasting in to a spreadsheet.
+func (l *Ledger) PrintPresentValueTSV(now time.Time, currentPrices map[Currency]float64) string {
+	b := &bytes.Buffer{}
+	c := csv.NewWriter(b)
+	c.Comma = '\t'
+
+	c.Write([]string{"lotName", "account", "currency", "amount", "costBasis", "origPurchaseDate",
+		"daysSincePurchase", "shortOrLongTerm", "presentValue", "unrealizedGainLoss", "unrealizedGainLossPercent"})
+	for _, lot := range l.lots {
+		if lot.amount > 0 && lot.lotType != TaxableGains {
+			daysSincePurchase := now.Sub(lot.originalPurchaseTime) / (24 * time.Hour)
+			shortOrLongTerm := "longTerm"
+			if daysSincePurchase < 365 {
+				shortOrLongTerm = "shortTerm"
+			}
+
+			var presentValue float64
+			{
+				currentPrice, ok := currentPrices[lot.currency]
+				if !ok {
+					panic("Missing prices for currency: " + lot.currency)
+				}
+				presentValue = lot.amount * currentPrice
+			}
+			var (
+				unrealizedGainLoss    = presentValue - lot.costBasis
+				unrealizedGainLossPct = unrealizedGainLoss / lot.costBasis * 100
+			)
+
+			c.Write([]string{
+				lot.name,
+				lot.account.String(),
+				lot.currency.String(),
+				fmt.Sprintf("%0.9f", lot.amount),
+				fmt.Sprintf("%0.2f", lot.costBasis),
+				fmt.Sprintf("%v", lot.originalPurchaseTime.Format("2006-01-02")),
+				fmt.Sprintf("%d", daysSincePurchase),
+				shortOrLongTerm,
+				fmt.Sprintf("%0.2f", presentValue),
+				fmt.Sprintf("%0.2f", unrealizedGainLoss),
+				fmt.Sprintf("%0.1f", unrealizedGainLossPct),
+			})
+		}
+	}
+	c.Flush()
+
+	return b.String()
 }
 
 // Round rounds f to the nearest integer.

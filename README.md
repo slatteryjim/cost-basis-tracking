@@ -65,6 +65,11 @@ func simpleScenario(w io.Writer) {
 
 	fmt.Fprintln(w, "=== Account balances (and their lots): ===")
 	fmt.Fprintln(w, l.PrintAccounts())
+
+	fmt.Fprintln(w, "=== Present Value, Tab-Separated (to copy into spreadsheet): ===")
+	fmt.Fprintln(w, l.PrintPresentValueTSV(time.Now(), map[ledger.Currency]float64{
+		BTC: 4028.89,
+	}))
 }
 ```
 
@@ -88,6 +93,12 @@ Coinbase
 		1.1.1  2017-04-06 Coinbase BTC 0.799000000  (basis:$1033.620311  price:$1293.642441)
 (Total basis: $1085.00)
 (Total initial investment: $1085.00)
+
+=== Present Value, Tab-Separated (to copy into spreadsheet): ===
+lotName	account	currency	amount	costBasis	origPurchaseDate	daysSincePurchase	shortOrLongTerm	presentValue	unrealizedGainLoss	unrealizedGainLossPercent
+1.1	Bitfinex	BTC	0.039766780	51.38	2017-04-06	626	longTerm	160.22	108.84	211.8
+1.1.1	Coinbase	BTC	0.799000000	1033.62	2017-04-06	626	longTerm	3219.08	2185.46	211.4
+
 ```
 
 See [ledger_test.go TestLargerScenario](ledger_test.go) for a more complex scenario with income and capital gains.

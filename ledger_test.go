@@ -65,6 +65,11 @@ Coinbase
 (Total basis: $1085.00)
 (Total initial investment: $1085.00)
 
+=== Present Value, Tab-Separated (to copy into spreadsheet): ===
+lotName	account	currency	amount	costBasis	origPurchaseDate	daysSincePurchase	shortOrLongTerm	presentValue	unrealizedGainLoss	unrealizedGainLossPercent
+1.1	Bitfinex	BTC	0.039766780	51.38	2017-04-06	626	longTerm	160.22	108.84	211.8
+1.1.1	Coinbase	BTC	0.799000000	1033.62	2017-04-06	626	longTerm	3219.08	2185.46	211.4
+
 `))
 }
 
@@ -121,6 +126,12 @@ Coinbase
 (Total basis: $2112.43)
 (Total initial investment: $1085.00)
 
+=== Present Value, Tab-Separated (to copy into spreadsheet): ===
+lotName	account	currency	amount	costBasis	origPurchaseDate	daysSincePurchase	shortOrLongTerm	presentValue	unrealizedGainLoss	unrealizedGainLossPercent
+1.1.1	Coinbase	BTC	0.418873380	570.02	2017-04-06	626	longTerm	1687.59	1117.57	196.1
+1.2.1	Coinbase	ETH	9.190000000	258.05	2017-04-06	626	longTerm	1195.07	937.01	363.1
+4.1	Coinbase	BTC	0.184032210	1284.36	2017-11-02	416	longTerm	741.45	-542.91	-42.3
+
 `))
 }
 
@@ -148,6 +159,11 @@ func simpleScenario(w io.Writer) {
 
 	fmt.Fprintln(w, "=== Account balances (and their lots): ===")
 	fmt.Fprintln(w, l.PrintAccounts())
+
+	fmt.Fprintln(w, "=== Present Value, Tab-Separated (to copy into spreadsheet): ===")
+	fmt.Fprintln(w, l.PrintPresentValueTSV(time.Now(), map[ledger.Currency]float64{
+		BTC: 4028.89,
+	}))
 }
 
 // largerScenario creates a ledger and adds a variety of activity to it.
@@ -192,6 +208,12 @@ func largerScenario(w io.Writer) {
 
 	fmt.Fprintln(w, "=== Account balances (and their lots): ===")
 	fmt.Fprintln(w, l.PrintAccounts())
+
+	fmt.Fprintln(w, "=== Present Value, Tab-Separated (to copy into spreadsheet): ===")
+	fmt.Fprintln(w, l.PrintPresentValueTSV(time.Now(), map[ledger.Currency]float64{
+		BTC: 4028.89,
+		ETH: 130.04,
+	}))
 }
 
 func d(date string) time.Time {
