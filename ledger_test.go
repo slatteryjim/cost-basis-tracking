@@ -161,7 +161,7 @@ func simpleScenario(w io.Writer) {
 	fmt.Fprintln(w, l.PrintAccounts())
 
 	fmt.Fprintln(w, "=== Present Value, Tab-Separated (to copy into spreadsheet): ===")
-	fmt.Fprintln(w, l.PrintPresentValueTSV(time.Now(), map[ledger.Currency]float64{
+	fmt.Fprintln(w, l.PrintPresentValueTSV(d("2018-12-23"), map[ledger.Currency]float64{
 		BTC: 4028.89,
 	}))
 }
@@ -210,7 +210,7 @@ func largerScenario(w io.Writer) {
 	fmt.Fprintln(w, l.PrintAccounts())
 
 	fmt.Fprintln(w, "=== Present Value, Tab-Separated (to copy into spreadsheet): ===")
-	fmt.Fprintln(w, l.PrintPresentValueTSV(time.Now(), map[ledger.Currency]float64{
+	fmt.Fprintln(w, l.PrintPresentValueTSV(d("2018-12-23"), map[ledger.Currency]float64{
 		BTC: 4028.89,
 		ETH: 130.04,
 	}))
