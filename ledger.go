@@ -234,7 +234,41 @@ func (l *Ledger) Spend(date time.Time, fromLotName string, soldCurrency Currency
 
 	// create taxable gains lot
 	gains := valueInLocalCurrency - soldCostBasis
-	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, gains, l.localCurrency))
+
+	// Terrible hack here..
+	// Temporarily doing something special with the lot naming here... don't want to modify the parent lot numbering,
+	// since that will muck up some existing accounting before this Spend() behavior was added.
+	// Create a generic "spendCapitalGains" lot, and reuse that.
+	//
+	// To remove this hack:
+	//   - Just create normal NewTaxableGainsLot(lot, ...), though that will modify existing numbers..
+	//     So modify the existing accounting to not use the strings? Maybe each operation will return a variable with
+	//     lot name that could be referenced in other places of the accounting? that way we can trace through what
+	//     lots are being referred to, in the code.
+	var spendCapitalGainsLot *Lot
+	{
+		var spendCapitalGainsLotName = lot.name + ".spendCapitalGains"
+		for _, lot := range l.lots {
+			if lot.name == spendCapitalGainsLotName {
+				spendCapitalGainsLot = lot
+			}
+		}
+		if spendCapitalGainsLot == nil {
+			spendCapitalGainsLot = NewLot(nil, spendCapitalGainsLotName, Asset, time.Time{}, "", lot.currency, 0, 0)
+			l.lots = append(l.lots, spendCapitalGainsLot)
+		}
+	}
+	// duplicating and modifying the NewTaxableGainsLot method logic here
+	//newLot := NewTaxableGainsLot(lot, date, soldAmount, gains, l.localCurrency)
+	newLot := NewChildLot(spendCapitalGainsLot, TaxableGains, date, "", lot.currency, 0, 0)
+
+	newLot.taxableGainsDetails = &TaxableGainsDetails{
+		soldAmount: soldAmount,
+		gains:      gains,
+		isLongTerm: date.Sub(lot.originalPurchaseTime) >= OneYearForCapitalGains,
+	}
+
+	l.lots = append(l.lots, newLot)
 
 	return valueInLocalCurrency
 }

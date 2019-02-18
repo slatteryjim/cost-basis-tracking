@@ -53,13 +53,14 @@ func TestSimpleScenario(t *testing.T) {
 
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Cost Basis Lots: ===
-1        2017-04-06 Bitfinex USD 0.000000000  (basis:$0.000000     price:$NaN)
-1.1      2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689    price:$1292.025388)
-1.1.1    2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
-1.1.1.1  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
+1                          2017-04-06 Bitfinex USD 0.000000000  (basis:$0.000000     price:$NaN)
+1.1                        2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689    price:$1292.025388)
+1.1.1                      2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
+1.1.1.spendCapitalGains    0001-01-01  BTC 0.000000000          (basis:$0.000000     price:$NaN)
+1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
 
 === Capital Gains: ===
-1.1.1.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
+1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
 (2017's capital gains: short-term:$5.48 long-term:$0.00)
 (Total capital gains: short-term:$5.48 long-term:$0.00)
 
@@ -95,26 +96,29 @@ func TestLargerScenario(t *testing.T) {
 
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Lots: ===
-1        2017-04-06 Bitfinex USD 0.000000000   (basis:$0.000000    price:$NaN)
-1.1      2017-04-06 Bitfinex BTC 0.000000000   (basis:$0.000000    price:$NaN)
-1.2      2017-04-06 Bitfinex ETH 0.000000000   (basis:$0.000000    price:$NaN)
-1.3      2017-04-06 Bitfinex DASH 0.000000000  (basis:$0.000000    price:$NaN)
-2        2017-08-01 Bitfinex BCH 0.000000000   (basis:$0.000000    price:$NaN)
-3        2017-10-23 Bitfinex BTG 0.000000000   (basis:$0.000000    price:$NaN)
-1.1.1    2017-04-06 Coinbase BTC 0.418873380   (basis:$575.526333  price:$1373.986413)
-1.1.1.1  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
-1.2.1    2017-04-06 Coinbase ETH 9.190000000  (basis:$260.691223  price:$28.366836)
-1.2.1.1  2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
-1.3.1    2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-1.3.2    2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
-2.1      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-2.2      2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
-3.1      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-3.2      2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
-4        2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000     price:$NaN)
-4.1      2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.260719  price:$6978.456211)
-4.1.1    2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
-1.1.1.2  2017-12-01 Taxable Gains (short-term) from sale of BTC 0.000010000: USD 0.096019
+1                          2017-04-06 Bitfinex USD 0.000000000   (basis:$0.000000    price:$NaN)
+1.1                        2017-04-06 Bitfinex BTC 0.000000000   (basis:$0.000000    price:$NaN)
+1.2                        2017-04-06 Bitfinex ETH 0.000000000   (basis:$0.000000    price:$NaN)
+1.3                        2017-04-06 Bitfinex DASH 0.000000000  (basis:$0.000000    price:$NaN)
+2                          2017-08-01 Bitfinex BCH 0.000000000   (basis:$0.000000    price:$NaN)
+3                          2017-10-23 Bitfinex BTG 0.000000000   (basis:$0.000000    price:$NaN)
+1.1.1                      2017-04-06 Coinbase BTC 0.418873380   (basis:$575.526333  price:$1373.986413)
+1.1.1.spendCapitalGains    0001-01-01  BTC 0.000000000           (basis:$0.000000    price:$NaN)
+1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
+1.2.1                      2017-04-06 Coinbase ETH 9.190000000  (basis:$260.691223  price:$28.366836)
+1.2.1.spendCapitalGains    0001-01-01  ETH 0.000000000          (basis:$0.000000    price:$NaN)
+1.2.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
+1.3.1                      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
+1.3.2                      2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
+2.1                        2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
+2.2                        2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
+3.1                        2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
+3.2                        2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
+4                          2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000     price:$NaN)
+4.1                        2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.260719  price:$6978.456211)
+4.1.spendCapitalGains      0001-01-01  BTC 0.000000000          (basis:$0.000000     price:$NaN)
+4.1.spendCapitalGains.1    2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
+1.1.1.spendCapitalGains.2  2017-12-01 Taxable Gains (short-term) from sale of BTC 0.000010000: USD 0.096019
 
 === Income: ===
 2	2017-08-01 Bitfinex BCH 0.358531680	(basis:212.250000000,	price:$591.997895)
@@ -122,13 +126,13 @@ func TestLargerScenario(t *testing.T) {
 (total income: $269.64)
 
 === Capital Gains: ===
-1.1.1.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
-1.2.1.1	2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
+1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
+1.2.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
 1.3.2	2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
 2.2	2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
 3.2	2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
-4.1.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
-1.1.1.2	2017-12-01 Taxable Gains (short-term) from sale of BTC 0.000010000: USD 0.096019
+4.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
+1.1.1.spendCapitalGains.2	2017-12-01 Taxable Gains (short-term) from sale of BTC 0.000010000: USD 0.096019
 (2017's capital gains: short-term:$765.84 long-term:$0.00)
 (Total capital gains: short-term:$765.84 long-term:$0.00)
 
