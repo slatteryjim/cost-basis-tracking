@@ -75,15 +75,12 @@ func (l *Ledger) Purchase(date time.Time, fromLotName string, toAccount Account,
 
 // Purchase represents an exchange of
 func (l *Ledger) Fee(date time.Time, fromLotName string, currency Currency, amount float64, applyFeeToCostBasisOfLot string) {
-	// find the given lot
-	feePaidFromLot := l.FindLotByName(fromLotName, currency)
-
-	// TODO: could also model the feePaidFromAmount as a "sale" for localCurrency, and then record that as capital gains, and
-	// add it to some other lot's cost basis. But the amounts are pretty small, so going to skip over that for now.
-	feeCostBasis := feePaidFromLot.Remove(currency, amount)
+	// Model the fee as a "sale" for localCurrency, and then record that as capital gains, and
+	//  add it to some other lot's cost basis.
+	valueInLocalCurrency := l.Spend(date, fromLotName, currency, amount)
 
 	feeAppliedToLot := l.findLotByName(applyFeeToCostBasisOfLot)
-	feeAppliedToLot.costBasis += feeCostBasis
+	feeAppliedToLot.costBasis += valueInLocalCurrency
 }
 
 // Transfer removes the given amount from the existing lot, and transfers it to a new account (minus the given fee).
