@@ -225,13 +225,16 @@ func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 // It records short or long term gains in a separate lot.
 // It looks up the daily price of the sold Currency to determine the localCurrency value of the spend.
 func (l *Ledger) Spend(date time.Time, fromLotName string, soldCurrency Currency, soldAmount float64) float64 {
-	valueInLocalCurrency := soldAmount * l.lookupPrice(soldCurrency, date)
-
 	// exchange for localCurrency, recording the capital gains
-	localCurrencyLot := l.ExchangeTaxable(date, fromLotName, soldCurrency, soldAmount, 0, true, l.localCurrency, valueInLocalCurrency)
+	lot := l.FindLotByName(fromLotName, soldCurrency)
+	soldCostBasis := lot.Remove(soldCurrency, soldAmount)
 
-	// drain the lot, withdrawing this money from the system.. it goes into the "ether"!
-	localCurrencyLot.Remove(l.localCurrency, valueInLocalCurrency)
+	// withdrawing this money from the system.. it goes into the "ether"!
+	valueInLocalCurrency := l.lookupPrice(soldCurrency, date) * soldAmount
+
+	// create taxable gains lot
+	gains := valueInLocalCurrency - soldCostBasis
+	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, gains, l.localCurrency))
 
 	return valueInLocalCurrency
 }
