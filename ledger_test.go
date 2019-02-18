@@ -29,7 +29,11 @@ const (
 var (
 	historicalPrices = map[ledger.Currency]map[time.Time]float64{
 		BTC: {
+			d("2017-11-01"): 6767.31,
 			d("2017-11-02"): 6960.07,
+		},
+		ETH: {
+			d("2017-11-01"): 291.69,
 		},
 	}
 )
@@ -48,27 +52,31 @@ func TestSimpleScenario(t *testing.T) {
 
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Cost Basis Lots: ===
-1      2017-04-06 Bitfinex USD 0.000000000  (basis:$0.000000     price:$NaN)
-1.1    2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689    price:$1292.025388)
-1.1.1  2017-04-06 Coinbase BTC 0.799000000  (basis:$1033.620311  price:$1293.642441)
+1        2017-04-06 Bitfinex USD 0.000000000  (basis:$0.000000     price:$NaN)
+1.1      2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689    price:$1292.025388)
+1.1.1    2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
+1.1.1.1  2017-11-01 Coinbase USD 0.000000000  (basis:$0.000000     price:$NaN)
+1.1.1.2  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
 
 === Capital Gains: ===
-(Total capital gains: short-term:$0.00 long-term:$0.00)
+1.1.1.2	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
+(2017's capital gains: short-term:$5.48 long-term:$0.00)
+(Total capital gains: short-term:$5.48 long-term:$0.00)
 
 === Account balances (and their lots): ===
 Bitfinex
 	BTC 0.039766780 (basis:51.379689	price:$1292.025388)
 		1.1  2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689  price:$1292.025388)
 Coinbase
-	BTC 0.799000000 (basis:1033.620311	price:$1293.642441)
-		1.1.1  2017-04-06 Coinbase BTC 0.799000000  (basis:$1033.620311  price:$1293.642441)
-(Total basis: $1085.00)
+	BTC 0.799000000 (basis:1039.095595	price:$1300.495113)
+		1.1.1  2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
+(Total basis: $1090.48)
 (Total initial investment: $1085.00)
 
 === Present Value, Tab-Separated (to copy into spreadsheet): ===
 lotName	account	currency	amount	costBasis	origPurchaseDate	daysSincePurchase	shortOrLongTerm	presentValue	unrealizedGainLoss	unrealizedGainLossPercent
 1.1	Bitfinex	BTC	0.039766780	51.38	2017-04-06	626	longTerm	160.22	108.84	211.8
-1.1.1	Coinbase	BTC	0.799000000	1033.62	2017-04-06	626	longTerm	3219.08	2185.46	211.4
+1.1.1	Coinbase	BTC	0.799000000	1039.10	2017-04-06	626	longTerm	3219.08	2179.99	209.8
 
 `))
 }
@@ -87,22 +95,28 @@ func TestLargerScenario(t *testing.T) {
 
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Lots: ===
-1      2017-04-06 Bitfinex USD 0.000000000   (basis:$0.000000    price:$NaN)
-1.1    2017-04-06 Bitfinex BTC 0.000000000   (basis:$0.000000    price:$NaN)
-1.2    2017-04-06 Bitfinex ETH 0.000000000   (basis:$0.000000    price:$NaN)
-1.3    2017-04-06 Bitfinex DASH 0.000000000  (basis:$0.000000    price:$NaN)
-2      2017-08-01 Bitfinex BCH 0.000000000   (basis:$0.000000    price:$NaN)
-3      2017-10-23 Bitfinex BTG 0.000000000   (basis:$0.000000    price:$NaN)
-1.1.1  2017-04-06 Coinbase BTC 0.418873380   (basis:$570.020573  price:$1360.842202)
-1.2.1  2017-04-06 Coinbase ETH 9.190000000   (basis:$258.054818  price:$28.079958)
-1.3.1  2017-11-02 Bitfinex BTC 0.000000000   (basis:$0.000000    price:$NaN)
-1.3.2  2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
-2.1    2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-2.2    2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
-3.1    2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-3.2    2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
-4      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000     price:$NaN)
-4.1    2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.357099  price:$6978.979923)
+1        2017-04-06 Bitfinex USD 0.000000000   (basis:$0.000000    price:$NaN)
+1.1      2017-04-06 Bitfinex BTC 0.000000000   (basis:$0.000000    price:$NaN)
+1.2      2017-04-06 Bitfinex ETH 0.000000000   (basis:$0.000000    price:$NaN)
+1.3      2017-04-06 Bitfinex DASH 0.000000000  (basis:$0.000000    price:$NaN)
+2        2017-08-01 Bitfinex BCH 0.000000000   (basis:$0.000000    price:$NaN)
+3        2017-10-23 Bitfinex BTG 0.000000000   (basis:$0.000000    price:$NaN)
+1.1.1    2017-04-06 Coinbase BTC 0.418873380   (basis:$575.430314  price:$1373.757182)
+1.1.1.1  2017-11-01 Coinbase USD 0.000000000   (basis:$0.000000    price:$NaN)
+1.1.1.2  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
+1.2.1    2017-04-06 Coinbase ETH 9.190000000  (basis:$260.691223  price:$28.366836)
+1.2.1.1  2017-11-01 Coinbase USD 0.000000000  (basis:$0.000000    price:$NaN)
+1.2.1.2  2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
+1.3.1    2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
+1.3.2    2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
+2.1      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
+2.2      2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
+3.1      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
+3.2      2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
+4        2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000     price:$NaN)
+4.1      2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.260719  price:$6978.456211)
+4.1.1    2017-11-01 Coinbase USD 0.000000000  (basis:$0.000000     price:$NaN)
+4.1.2    2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
 
 === Income: ===
 2	2017-08-01 Bitfinex BCH 0.358531680	(basis:212.250000000,	price:$591.997895)
@@ -110,27 +124,30 @@ func TestLargerScenario(t *testing.T) {
 (total income: $269.64)
 
 === Capital Gains: ===
+1.1.1.2	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
+1.2.1.2	2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
 1.3.2	2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
 2.2	2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
 3.2	2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
-(2017's capital gains: short-term:$757.80 long-term:$0.00)
-(Total capital gains: short-term:$757.80 long-term:$0.00)
+4.1.2	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
+(2017's capital gains: short-term:$765.75 long-term:$0.00)
+(Total capital gains: short-term:$765.75 long-term:$0.00)
 
 === Account balances (and their lots): ===
 Coinbase
-	BTC 0.602905590 (basis:1854.377672	price:$3075.734746)
-		1.1.1  2017-04-06 Coinbase BTC 0.418873380  (basis:$570.020573   price:$1360.842202)
-		4.1    2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.357099  price:$6978.979923)
-	ETH 9.190000000 (basis:258.054818	price:$28.079958)
-		1.2.1  2017-04-06 Coinbase ETH 9.190000000  (basis:$258.054818  price:$28.079958)
-(Total basis: $2112.43)
+	BTC 0.602905590 (basis:1859.691033	price:$3084.547670)
+		1.1.1  2017-04-06 Coinbase BTC 0.418873380  (basis:$575.430314   price:$1373.757182)
+		4.1    2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.260719  price:$6978.456211)
+	ETH 9.190000000 (basis:260.691223	price:$28.366836)
+		1.2.1  2017-04-06 Coinbase ETH 9.190000000  (basis:$260.691223  price:$28.366836)
+(Total basis: $2120.38)
 (Total initial investment: $1085.00)
 
 === Present Value, Tab-Separated (to copy into spreadsheet): ===
 lotName	account	currency	amount	costBasis	origPurchaseDate	daysSincePurchase	shortOrLongTerm	presentValue	unrealizedGainLoss	unrealizedGainLossPercent
-1.1.1	Coinbase	BTC	0.418873380	570.02	2017-04-06	626	longTerm	1687.59	1117.57	196.1
-1.2.1	Coinbase	ETH	9.190000000	258.05	2017-04-06	626	longTerm	1195.07	937.01	363.1
-4.1	Coinbase	BTC	0.184032210	1284.36	2017-11-02	416	longTerm	741.45	-542.91	-42.3
+1.1.1	Coinbase	BTC	0.418873380	575.43	2017-04-06	626	longTerm	1687.59	1112.16	193.3
+1.2.1	Coinbase	ETH	9.190000000	260.69	2017-04-06	626	longTerm	1195.07	934.38	358.4
+4.1	Coinbase	BTC	0.184032210	1284.26	2017-11-02	416	longTerm	741.45	-542.82	-42.3
 
 `))
 }

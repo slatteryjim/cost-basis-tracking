@@ -94,14 +94,16 @@ func (l *Ledger) Transfer(date time.Time, fromLotName string, currency Currency,
 	lot := l.FindLotByName(fromLotName, currency)
 	costBasis := lot.Remove(currency, amountRemoved)
 
-	// feePaidFromAmount goes "out into the ether"
-	// TODO: could also model the feePaidFromAmount as a "sale" for localCurrency, and then record that as capital gains, and
-	// add it to the new lot's cost basis. But the amounts are pretty small, so going to skip over that for now.
-	amountInDest := amountRemoved - feePaidFromAmount
-
 	// create a new lot
-	newLot := NewChildLot(lot, Asset, lot.originalPurchaseTime, toAccount, currency, amountInDest, costBasis)
+	newLot := NewChildLot(lot, Asset, lot.originalPurchaseTime, toAccount, currency, amountRemoved, costBasis)
 	l.lots = append(l.lots, newLot)
+
+	// "Spend" the feePaidFromAmount.
+	// We treat it as a "sale" for localCurrency, and then record it as capital gains,
+	// and add the amount to the new lot's cost basis.
+	valueInLocalCurrency := l.Spend(date, newLot.name, currency, feePaidFromAmount)
+	newLot.costBasis += valueInLocalCurrency
+
 	return newLot
 }
 
@@ -198,7 +200,7 @@ func (l *Ledger) TransferMultipleLotsFeeInLast(date time.Time, fromLotNames []st
 //
 func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 	soldCurrency Currency, soldAmount, feeInSoldCurrency float64, lookupSoldCurrencyPriceForTaxableGains bool,
-	purchasedCurrency Currency, purchasedAmountReceived float64) {
+	purchasedCurrency Currency, purchasedAmountReceived float64) *Lot {
 
 	// TODO: feeInSoldCurrency is never used.. maybe could just make a note of it if we record a list of transactions and associated lots.
 
@@ -212,12 +214,29 @@ func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 	} else {
 		purchasedLocalCurrencyEquivalent = l.lookupPrice(purchasedCurrency, date) * purchasedAmountReceived
 	}
-
-	l.lots = append(l.lots, NewChildLot(lot, Asset, date, lot.account, purchasedCurrency, purchasedAmountReceived, purchasedLocalCurrencyEquivalent))
+	newDestinationLot := NewChildLot(lot, Asset, date, lot.account, purchasedCurrency, purchasedAmountReceived, purchasedLocalCurrencyEquivalent)
+	l.lots = append(l.lots, newDestinationLot)
 
 	// create taxable gains lot
 	purchasedCostBasis := purchasedLocalCurrencyEquivalent - soldCostBasis
 	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, purchasedCostBasis, l.localCurrency))
+
+	return newDestinationLot
+}
+
+// Spend records the sale of a given currency.
+// It records short or long term gains in a separate lot.
+// It looks up the daily price of the sold Currency to determine the localCurrency value of the spend.
+func (l *Ledger) Spend(date time.Time, fromLotName string, soldCurrency Currency, soldAmount float64) float64 {
+	valueInLocalCurrency := soldAmount * l.lookupPrice(soldCurrency, date)
+
+	// exchange for localCurrency, recording the capital gains
+	localCurrencyLot := l.ExchangeTaxable(date, fromLotName, soldCurrency, soldAmount, 0, true, l.localCurrency, valueInLocalCurrency)
+
+	// drain the lot, withdrawing this money from the system.. it goes into the "ether"!
+	localCurrencyLot.Remove(l.localCurrency, valueInLocalCurrency)
+
+	return valueInLocalCurrency
 }
 
 // ExchangeTaxableMultipleLots records an exchange of one currency for another, performed across multiple lots.
