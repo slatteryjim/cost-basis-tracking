@@ -47,6 +47,8 @@ type (
 		proceeds float64
 
 		soldAmount float64
+
+		note string
 	}
 
 	// LotType identifies what kind of lot this is.
@@ -55,7 +57,7 @@ type (
 
 // NewTaxableGainsDetails constructs a *TaxableGainsDetails
 func NewTaxableGainsDetails(account Account, currency Currency, originalPurchaseTime time.Time,
-	costBasis float64, dateOfSale time.Time, proceeds float64, soldAmount float64) *TaxableGainsDetails {
+	costBasis float64, dateOfSale time.Time, proceeds float64, soldAmount float64, note string) *TaxableGainsDetails {
 
 	return &TaxableGainsDetails{
 		account:              account,
@@ -65,6 +67,7 @@ func NewTaxableGainsDetails(account Account, currency Currency, originalPurchase
 		dateOfSale:           dateOfSale,
 		proceeds:             proceeds,
 		soldAmount:           soldAmount,
+		note:                 note,
 	}
 }
 
@@ -116,12 +119,12 @@ func NewChildLot(parent *Lot, lotType LotType, purchaseTime time.Time, account A
 }
 
 // NewTaxableGainsLot creates a TaxableGains lot, and also determines whether it's long-term or short-term.
-func NewTaxableGainsLot(parent *Lot, date time.Time, soldAmount, costBasis, proceeds float64, localCurrency Currency) *Lot {
+func NewTaxableGainsLot(parent *Lot, date time.Time, soldAmount, costBasis, proceeds float64, localCurrency Currency, note string) *Lot {
 	lot := NewChildLot(parent, TaxableGains, date, "", localCurrency, 0, 0)
 
 	lot.taxableGainsDetails = NewTaxableGainsDetails(
 		parent.account, parent.currency, parent.originalPurchaseTime,
-		costBasis, date, proceeds, soldAmount)
+		costBasis, date, proceeds, soldAmount, note)
 
 	return lot
 }
@@ -134,8 +137,10 @@ func (lot *Lot) String() string {
 		if details.IsLongTerm() {
 			term = "long"
 		}
-		return fmt.Sprintf("%s\t%s Taxable Gains (%s-term) from sale of %s %0.9f: USD %f", lot.name, lot.originalPurchaseTime.Format("2006-01-02"),
-			term, lot.parent.currency, details.soldAmount, details.gains)
+		return fmt.Sprintf("%s\t%s Taxable Gains (%s-term) from sale on %s of %s %0.9f originally purchased %s for USD %f. proceeds=USD %f, gains=USD %f, note=%s",
+			lot.name, lot.originalPurchaseTime.Format("2006-01-02"),
+			term, details.account, details.currency, details.soldAmount, details.originalPurchaseTime.Format("2006-01-02"),
+			details.costBasis, details.proceeds, details.Gains(), details.note)
 	}
 
 	return fmt.Sprintf("%s\t%s %s %s %0.9f\t(basis:$%f\tprice:$%f)", lot.name, lot.originalPurchaseTime.Format("2006-01-02"),

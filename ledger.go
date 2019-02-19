@@ -74,12 +74,13 @@ func (l *Ledger) Purchase(date time.Time, fromLotName string, toAccount Account,
 }
 
 // Purchase represents an exchange of
-func (l *Ledger) Fee(date time.Time, fromLotName string, currency Currency, amount float64, applyFeeToCostBasisOfLot string) {
+func (l *Ledger) Fee(date time.Time, fromLotName string, currency Currency, amount float64, applyFeeToCostBasisOfLot string, note string) {
 	// Model the fee as a "sale" for localCurrency, and then record that as capital gains, and
 	//  add it to some other lot's cost basis.
-	valueInLocalCurrency := l.Spend(date, fromLotName, currency, amount)
-
 	feeAppliedToLot := l.findLotByName(applyFeeToCostBasisOfLot)
+
+	valueInLocalCurrency := l.Spend(date, feeAppliedToLot.account, fromLotName, currency, amount, "fee applied: "+note)
+
 	feeAppliedToLot.costBasis += valueInLocalCurrency
 }
 
@@ -98,7 +99,8 @@ func (l *Ledger) Transfer(date time.Time, fromLotName string, currency Currency,
 	// "Spend" the feePaidFromAmount.
 	// We treat it as a "sale" for localCurrency, and then record it as capital gains,
 	// and add the amount to the new lot's cost basis.
-	valueInLocalCurrency := l.Spend(date, newLot.name, currency, feePaidFromAmount)
+	valueInLocalCurrency := l.Spend(date, lot.account, newLot.name, currency, feePaidFromAmount,
+		fmt.Sprintf("fee for transferring from %s to %s", lot.account, toAccount))
 	newLot.costBasis += valueInLocalCurrency
 
 	return newLot
@@ -215,7 +217,8 @@ func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 	l.lots = append(l.lots, newDestinationLot)
 
 	// create taxable gains lot
-	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, soldCostBasis, purchasedLocalCurrencyEquivalent, l.localCurrency))
+	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, soldCostBasis, purchasedLocalCurrencyEquivalent, l.localCurrency,
+		fmt.Sprintf("exchanging %s for %s", soldCurrency, purchasedCurrency)))
 
 	return newDestinationLot
 }
@@ -223,7 +226,9 @@ func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 // Spend records the sale of a given currency.
 // It records short or long term gains in a separate lot.
 // It looks up the daily price of the sold Currency to determine the localCurrency value of the spend.
-func (l *Ledger) Spend(date time.Time, fromLotName string, soldCurrency Currency, soldAmount float64) float64 {
+func (l *Ledger) Spend(date time.Time, feeWasFromAccount Account, fromLotName string,
+	soldCurrency Currency, soldAmount float64, note string) float64 {
+
 	// nothing to do if amount is zero
 	if soldAmount == 0 {
 		return 0
@@ -267,8 +272,8 @@ func (l *Ledger) Spend(date time.Time, fromLotName string, soldCurrency Currency
 		newLot := NewChildLot(spendCapitalGainsLot, TaxableGains, date, "", lot.currency, 0, 0)
 
 		newLot.taxableGainsDetails = NewTaxableGainsDetails(
-			lot.account, lot.currency, lot.originalPurchaseTime,
-			soldCostBasis, date, valueInLocalCurrency, soldAmount,
+			feeWasFromAccount, lot.currency, lot.originalPurchaseTime,
+			soldCostBasis, date, valueInLocalCurrency, soldAmount, note,
 		)
 		l.lots = append(l.lots, newLot)
 	}

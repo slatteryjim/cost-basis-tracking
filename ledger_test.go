@@ -57,10 +57,10 @@ func TestSimpleScenario(t *testing.T) {
 1.1                        2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689    price:$1292.025388)
 1.1.1                      2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
 1.1.1.spendCapitalGains    0001-01-01  BTC 0.000000000          (basis:$0.000000     price:$NaN)
-1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
+1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.292025. proceeds=USD 6.767310, gains=USD 5.475285, note=fee for transferring from Bitfinex to Coinbase
 
 === Capital Gains: ===
-1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.475285
+1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.292025. proceeds=USD 6.767310, gains=USD 5.475285, note=fee for transferring from Bitfinex to Coinbase
 (2017's capital gains: short-term:$5.48 long-term:$0.00)
 (Total capital gains: short-term:$5.48 long-term:$0.00)
 
@@ -104,21 +104,21 @@ func TestLargerScenario(t *testing.T) {
 3                          2017-10-23 Bitfinex BTG 0.000000000   (basis:$0.000000    price:$NaN)
 1.1.1                      2017-04-06 Coinbase BTC 0.418873380   (basis:$575.526333  price:$1373.986413)
 1.1.1.spendCapitalGains    0001-01-01  BTC 0.000000000           (basis:$0.000000    price:$NaN)
-1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
+1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.357569. proceeds=USD 6.767310, gains=USD 5.409741, note=fee for transferring from Bitfinex to Coinbase
 1.2.1                      2017-04-06 Coinbase ETH 9.190000000  (basis:$260.691223  price:$28.366836)
 1.2.1.spendCapitalGains    0001-01-01  ETH 0.000000000          (basis:$0.000000    price:$NaN)
-1.2.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
+1.2.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of ETH 0.010000000 originally purchased 2017-04-06 for USD 0.280494. proceeds=USD 2.916900, gains=USD 2.636406, note=fee for transferring from Bitfinex to Coinbase
 1.3.1                      2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-1.3.2                      2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
+1.3.2                      2017-11-02 Taxable Gains (short-term) from sale on Bitfinex of DASH 4.000000000 originally purchased 2017-04-06 for USD 256.924609. proceeds=USD 1045.038363, gains=USD 788.113754, note=exchanging DASH for BTC
 2.1                        2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-2.2                        2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
+2.2                        2017-11-02 Taxable Gains (short-term) from sale on Bitfinex of BCH 0.358531680 originally purchased 2017-08-01 for USD 212.250000. proceeds=USD 192.414406, gains=USD -19.835594, note=exchanging BCH for BTC
 3.1                        2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000  price:$NaN)
-3.2                        2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
+3.2                        2017-11-02 Taxable Gains (short-term) from sale on Bitfinex of BTG 0.419883380 originally purchased 2017-10-23 for USD 57.386000. proceeds=USD 46.904329, gains=USD -10.481671, note=exchanging BTG for BTC
 4                          2017-11-02 Bitfinex BTC 0.000000000  (basis:$0.000000     price:$NaN)
 4.1                        2017-11-02 Coinbase BTC 0.184032210  (basis:$1284.260719  price:$6978.456211)
 4.1.spendCapitalGains      0001-01-01  BTC 0.000000000          (basis:$0.000000     price:$NaN)
-4.1.spendCapitalGains.1    2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
-1.1.1.spendCapitalGains.2  2017-12-01 Taxable Gains (short-term) from sale of BTC 0.000010000: USD 0.096019
+4.1.spendCapitalGains.1    2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.000500000 originally purchased 2017-11-02 for USD 3.480035. proceeds=USD 3.383655, gains=USD -0.096380, note=fee for transferring from Bitfinex to Coinbase
+1.1.1.spendCapitalGains.2  2017-12-01 Taxable Gains (short-term) from sale on Coinbase of BTC 0.000010000 originally purchased 2017-04-06 for USD 0.013737. proceeds=USD 0.109756, gains=USD 0.096019, note=fee applied: some random fee
 
 === Income: ===
 2	2017-08-01 Bitfinex BCH 0.358531680	(basis:212.250000000,	price:$591.997895)
@@ -126,13 +126,13 @@ func TestLargerScenario(t *testing.T) {
 (total income: $269.64)
 
 === Capital Gains: ===
-1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.001000000: USD 5.409741
-1.2.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of ETH 0.010000000: USD 2.636406
-1.3.2	2017-11-02 Taxable Gains (short-term) from sale of DASH 4.000000000: USD 788.113754
-2.2	2017-11-02 Taxable Gains (short-term) from sale of BCH 0.358531680: USD -19.835594
-3.2	2017-11-02 Taxable Gains (short-term) from sale of BTG 0.419883380: USD -10.481671
-4.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale of BTC 0.000500000: USD -0.096380
-1.1.1.spendCapitalGains.2	2017-12-01 Taxable Gains (short-term) from sale of BTC 0.000010000: USD 0.096019
+1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.357569. proceeds=USD 6.767310, gains=USD 5.409741, note=fee for transferring from Bitfinex to Coinbase
+1.2.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of ETH 0.010000000 originally purchased 2017-04-06 for USD 0.280494. proceeds=USD 2.916900, gains=USD 2.636406, note=fee for transferring from Bitfinex to Coinbase
+1.3.2	2017-11-02 Taxable Gains (short-term) from sale on Bitfinex of DASH 4.000000000 originally purchased 2017-04-06 for USD 256.924609. proceeds=USD 1045.038363, gains=USD 788.113754, note=exchanging DASH for BTC
+2.2	2017-11-02 Taxable Gains (short-term) from sale on Bitfinex of BCH 0.358531680 originally purchased 2017-08-01 for USD 212.250000. proceeds=USD 192.414406, gains=USD -19.835594, note=exchanging BCH for BTC
+3.2	2017-11-02 Taxable Gains (short-term) from sale on Bitfinex of BTG 0.419883380 originally purchased 2017-10-23 for USD 57.386000. proceeds=USD 46.904329, gains=USD -10.481671, note=exchanging BTG for BTC
+4.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.000500000 originally purchased 2017-11-02 for USD 3.480035. proceeds=USD 3.383655, gains=USD -0.096380, note=fee for transferring from Bitfinex to Coinbase
+1.1.1.spendCapitalGains.2	2017-12-01 Taxable Gains (short-term) from sale on Coinbase of BTC 0.000010000 originally purchased 2017-04-06 for USD 0.013737. proceeds=USD 0.109756, gains=USD 0.096019, note=fee applied: some random fee
 (2017's capital gains: short-term:$765.84 long-term:$0.00)
 (Total capital gains: short-term:$765.84 long-term:$0.00)
 
@@ -213,7 +213,7 @@ func largerScenario(w io.Writer) {
 	l.Transfer(d("2017-11-01"), "4", BTC, 0.18453221, 0.0005, Coinbase)
 
 	// 12/1 Invent some random fee
-	l.Fee(d("2017-12-01"), "1.1.1", BTC, 0.00001, "1.1.1")
+	l.Fee(d("2017-12-01"), "1.1.1", BTC, 0.00001, "1.1.1", "some random fee")
 
 	//
 	// Print results
