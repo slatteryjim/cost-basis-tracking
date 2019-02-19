@@ -215,8 +215,7 @@ func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 	l.lots = append(l.lots, newDestinationLot)
 
 	// create taxable gains lot
-	purchasedCostBasis := purchasedLocalCurrencyEquivalent - soldCostBasis
-	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, purchasedCostBasis, l.localCurrency))
+	l.lots = append(l.lots, NewTaxableGainsLot(lot, date, soldAmount, soldCostBasis, purchasedLocalCurrencyEquivalent, l.localCurrency))
 
 	return newDestinationLot
 }
@@ -267,12 +266,10 @@ func (l *Ledger) Spend(date time.Time, fromLotName string, soldCurrency Currency
 		//newLot := NewTaxableGainsLot(lot, date, soldAmount, gains, l.localCurrency)
 		newLot := NewChildLot(spendCapitalGainsLot, TaxableGains, date, "", lot.currency, 0, 0)
 
-		newLot.taxableGainsDetails = &TaxableGainsDetails{
-			soldAmount: soldAmount,
-			gains:      gains,
-			isLongTerm: date.Sub(lot.originalPurchaseTime) >= OneYearForCapitalGains,
-		}
-
+		newLot.taxableGainsDetails = NewTaxableGainsDetails(
+			lot.account, lot.currency, lot.originalPurchaseTime,
+			soldCostBasis, date, valueInLocalCurrency, soldAmount,
+		)
 		l.lots = append(l.lots, newLot)
 	}
 
@@ -479,11 +476,11 @@ func (l *Ledger) PrintTaxableGains() string {
 		if lot.lotType == TaxableGains {
 			var (
 				details = lot.taxableGainsDetails
-				gain    = details.gains
+				gain    = details.Gains()
 				year    = lot.originalPurchaseTime.Year()
 			)
 
-			if details.isLongTerm {
+			if details.IsLongTerm() {
 				totalLongTerm += gain
 				longTermByYear[year] += gain
 			} else {

@@ -29,17 +29,56 @@ type (
 
 	// TaxableGainsDetails store the details for TaxableGain lot types.
 	TaxableGainsDetails struct {
+
+		// Service:            Coinbase
+		account Account
+		// Asset name:          Bitcoin
+		currency Currency
+
+		// Date of purchase: 07/10/2017
+		originalPurchaseTime time.Time
+		// Cost basis:        $1,000.00
+		costBasis float64
+
+		// Date of sale:     01/05/2018
+		dateOfSale time.Time
+
+		// Proceeds:         $11,636.53
+		proceeds float64
+
 		soldAmount float64
-
-		gains float64
-
-		// false indicates short-term capital gains.
-		isLongTerm bool
 	}
 
 	// LotType identifies what kind of lot this is.
 	LotType int
 )
+
+// NewTaxableGainsDetails constructs a *TaxableGainsDetails
+func NewTaxableGainsDetails(account Account, currency Currency, originalPurchaseTime time.Time,
+	costBasis float64, dateOfSale time.Time, proceeds float64, soldAmount float64) *TaxableGainsDetails {
+
+	return &TaxableGainsDetails{
+		account:              account,
+		currency:             currency,
+		originalPurchaseTime: originalPurchaseTime,
+		costBasis:            costBasis,
+		dateOfSale:           dateOfSale,
+		proceeds:             proceeds,
+		soldAmount:           soldAmount,
+	}
+}
+
+// Gains returns the value of the proceeds minus the cost basis.
+func (d *TaxableGainsDetails) Gains() float64 {
+	return d.proceeds - d.costBasis
+}
+
+// IsLongTerm returns true if the currency was held for more than one year.
+// If false, the gains are to be considered short-term gains.
+func (d *TaxableGainsDetails) IsLongTerm() bool {
+	duration := d.dateOfSale.Sub(d.originalPurchaseTime)
+	return duration >= OneYearForCapitalGains
+}
 
 const (
 	// Asset is a basic holding of some currency.
@@ -77,14 +116,12 @@ func NewChildLot(parent *Lot, lotType LotType, purchaseTime time.Time, account A
 }
 
 // NewTaxableGainsLot creates a TaxableGains lot, and also determines whether it's long-term or short-term.
-func NewTaxableGainsLot(parent *Lot, date time.Time, soldAmount, gains float64, localCurrency Currency) *Lot {
+func NewTaxableGainsLot(parent *Lot, date time.Time, soldAmount, costBasis, proceeds float64, localCurrency Currency) *Lot {
 	lot := NewChildLot(parent, TaxableGains, date, "", localCurrency, 0, 0)
 
-	lot.taxableGainsDetails = &TaxableGainsDetails{
-		soldAmount: soldAmount,
-		gains:      gains,
-		isLongTerm: date.Sub(parent.originalPurchaseTime) >= OneYearForCapitalGains,
-	}
+	lot.taxableGainsDetails = NewTaxableGainsDetails(
+		parent.account, parent.currency, parent.originalPurchaseTime,
+		costBasis, date, proceeds, soldAmount)
 
 	return lot
 }
@@ -94,7 +131,7 @@ func (lot *Lot) String() string {
 	if lot.lotType == TaxableGains {
 		details := lot.taxableGainsDetails
 		term := "short"
-		if details.isLongTerm {
+		if details.IsLongTerm() {
 			term = "long"
 		}
 		return fmt.Sprintf("%s\t%s Taxable Gains (%s-term) from sale of %s %0.9f: USD %f", lot.name, lot.originalPurchaseTime.Format("2006-01-02"),
