@@ -634,6 +634,42 @@ func (l *Ledger) PrintPresentValueTSV(now time.Time, currentPrices map[Currency]
 	return b.String()
 }
 
+// PrintCapitalGainsTSV will display information on the capital gains,
+// printed as tab-separated values, suitable for pasting in to a spreadsheet.
+func (l *Ledger) PrintCapitalGainsTSV() string {
+	b := &bytes.Buffer{}
+	c := csv.NewWriter(b)
+	c.Comma = '\t'
+
+	c.Write([]string{"lotName", "year", "account", "currency", "currencyAmount", "origPurchaseDate", "costBasis", "saleDate", "proceeds", "term", "gains", "note"})
+	for _, lot := range l.lots {
+		if lot.lotType == TaxableGains {
+			details := lot.taxableGainsDetails
+			term := "short"
+			if details.IsLongTerm() {
+				term = "long"
+			}
+			c.Write([]string{
+				lot.name,
+				details.dateOfSale.Format("2006"),
+				details.account.String(),
+				details.currency.String(),
+				fmt.Sprintf("%0.9f", details.soldAmount),
+				details.originalPurchaseTime.Format("2006-01-02"),
+				fmt.Sprintf("%0.2f", details.costBasis),
+				details.dateOfSale.Format("2006-01-02"),
+				fmt.Sprintf("%0.2f", details.proceeds),
+				term,
+				fmt.Sprintf("%0.2f", details.Gains()),
+				details.note,
+			})
+		}
+	}
+	c.Flush()
+
+	return b.String()
+}
+
 // Round rounds f to the nearest integer.
 // https://gist.github.com/DavidVaini/10308388
 func Round(f float64) float64 {

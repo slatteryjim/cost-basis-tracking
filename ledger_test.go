@@ -51,6 +51,8 @@ func TestSimpleScenario(t *testing.T) {
 	// and broken-down by cost basis lots.
 	simpleScenario(b)
 
+	//fmt.Println(b)
+	//return
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Cost Basis Lots: ===
 1                          2017-04-06 Bitfinex USD 0.000000000  (basis:$0.000000     price:$NaN)
@@ -63,6 +65,10 @@ func TestSimpleScenario(t *testing.T) {
 1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.292025. proceeds=USD 6.767310, gains=USD 5.475285, note=fee for transferring from Bitfinex to Coinbase
 (2017's capital gains: short-term:$5.48 long-term:$0.00)
 (Total capital gains: short-term:$5.48 long-term:$0.00)
+
+=== Capital Gains, Tab-Separated (to copy into spreadsheet): ===
+lotName	year	account	currency	currencyAmount	origPurchaseDate	costBasis	saleDate	proceeds	term	gains	note
+1.1.1.spendCapitalGains.1	2017	Bitfinex	BTC	0.001000000	2017-04-06	1.29	2017-11-01	6.77	short	5.48	fee for transferring from Bitfinex to Coinbase
 
 === Account balances (and their lots): ===
 Bitfinex
@@ -94,6 +100,8 @@ func TestLargerScenario(t *testing.T) {
 	// and broken-down by cost basis lots.
 	largerScenario(b)
 
+	//fmt.Println(b)
+	//return
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Lots: ===
 1                          2017-04-06 Bitfinex USD 0.000000000   (basis:$0.000000    price:$NaN)
@@ -136,6 +144,16 @@ func TestLargerScenario(t *testing.T) {
 (2017's capital gains: short-term:$765.84 long-term:$0.00)
 (Total capital gains: short-term:$765.84 long-term:$0.00)
 
+=== Capital Gains, Tab-Separated (to copy into spreadsheet): ===
+lotName	year	account	currency	currencyAmount	origPurchaseDate	costBasis	saleDate	proceeds	term	gains	note
+1.1.1.spendCapitalGains.1	2017	Bitfinex	BTC	0.001000000	2017-04-06	1.36	2017-11-01	6.77	short	5.41	fee for transferring from Bitfinex to Coinbase
+1.2.1.spendCapitalGains.1	2017	Bitfinex	ETH	0.010000000	2017-04-06	0.28	2017-11-01	2.92	short	2.64	fee for transferring from Bitfinex to Coinbase
+1.3.2	2017	Bitfinex	DASH	4.000000000	2017-04-06	256.92	2017-11-02	1045.04	short	788.11	exchanging DASH for BTC
+2.2	2017	Bitfinex	BCH	0.358531680	2017-08-01	212.25	2017-11-02	192.41	short	-19.84	exchanging BCH for BTC
+3.2	2017	Bitfinex	BTG	0.419883380	2017-10-23	57.39	2017-11-02	46.90	short	-10.48	exchanging BTG for BTC
+4.1.spendCapitalGains.1	2017	Bitfinex	BTC	0.000500000	2017-11-02	3.48	2017-11-01	3.38	short	-0.10	fee for transferring from Bitfinex to Coinbase
+1.1.1.spendCapitalGains.2	2017	Coinbase	BTC	0.000010000	2017-04-06	0.01	2017-12-01	0.11	short	0.10	fee applied: some random fee
+
 === Account balances (and their lots): ===
 Coinbase
 	BTC 0.602905590 (basis:1859.787052	price:$3084.706930)
@@ -176,6 +194,9 @@ func simpleScenario(w io.Writer) {
 
 	fmt.Fprintln(w, "=== Capital Gains: ===")
 	fmt.Fprintln(w, l.PrintTaxableGains())
+
+	fmt.Fprintln(w, "=== Capital Gains, Tab-Separated (to copy into spreadsheet): ===")
+	fmt.Fprintln(w, l.PrintCapitalGainsTSV())
 
 	fmt.Fprintln(w, "=== Account balances (and their lots): ===")
 	fmt.Fprintln(w, l.PrintAccounts())
@@ -225,6 +246,9 @@ func largerScenario(w io.Writer) {
 
 	fmt.Fprintln(w, "=== Capital Gains: ===")
 	fmt.Fprintln(w, l.PrintTaxableGains())
+
+	fmt.Fprintln(w, "=== Capital Gains, Tab-Separated (to copy into spreadsheet): ===")
+	fmt.Fprintln(w, l.PrintCapitalGainsTSV())
 
 	fmt.Fprintln(w, "=== Account balances (and their lots): ===")
 	fmt.Fprintln(w, l.PrintAccounts())
