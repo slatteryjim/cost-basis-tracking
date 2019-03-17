@@ -168,25 +168,6 @@ func (l *Ledger) TransferMultipleLotsFully(date time.Time, fromLotNames []string
 	return newLots
 }
 
-// TransferMultipleLotsFeeInLast removes the desired amount from the existing lots (emptying them in order), transferring them to a new account.
-// The fee is paid from the last lot, and its cost basis is spread across the target lots.
-// TODO: remove this method, I think we can just transfer MultipleLots.. once they are used for an exchange, we can just MergeIdenticalLots
-func (l *Ledger) TransferMultipleLotsFeeInLast(date time.Time, fromLotNames []string, feeFromLotName string, currency Currency, amountTransferred, feeFromSeparateLot float64, toAccount Account) []*Lot {
-	newLots := l.TransferMultipleLotsFully(date, fromLotNames, currency, amountTransferred, 0, toAccount)
-
-	// pull out the fee amount, and inflate the cost basis of the lots
-	// TODO: could record this fee as a taxable "sale", but the amounts are pretty insignificant so going to skip it for now
-	lot := l.FindLotByName(feeFromLotName, currency)
-	feeCostBasis := lot.Remove(currency, feeFromSeparateLot)
-
-	// spread the feeCostBasis across the newly-created lots
-	for _, lot := range newLots {
-		feeCostBasisPortion := (lot.amount / amountTransferred) * feeCostBasis
-		lot.costBasis += feeCostBasisPortion
-	}
-	return newLots
-}
-
 // ExchangeTaxable records an exchange of one currency for another.
 // It records short or long term gains in a separate lot.
 // It looks up the daily price of the sold or purchased Currency to determine the localCurrency value of the exchange.

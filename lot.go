@@ -129,6 +129,12 @@ func NewTaxableGainsLot(parent *Lot, date time.Time, soldAmount, costBasis, proc
 	return lot
 }
 
+// Name returns the name of the lot.
+func (lot *Lot) Name() string {
+	return lot.name
+}
+
+// String returns a string describing the lot.
 func (lot *Lot) String() string {
 
 	if lot.lotType == TaxableGains {
