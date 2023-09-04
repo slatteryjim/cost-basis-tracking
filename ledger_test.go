@@ -57,33 +57,32 @@ func TestSimpleScenario(t *testing.T) {
 	g.Expect(b.String()).To(BeEquivalentTo(
 		`=== Cost Basis Lots: ===
 1                          2017-04-06 Bitfinex USD 0.000000000  (basis:$0.000000     price:$NaN)
-1.1                        2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689    price:$1292.025388)
+1.1                        2017-04-06 Bitfinex BTC 0.000000000  (basis:$0.000000     price:$NaN)
 1.1.1                      2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
 1.1.1.spendCapitalGains    0001-01-01  BTC 0.000000000          (basis:$0.000000     price:$NaN)
 1.1.1.spendCapitalGains.1  2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.292025. proceeds=USD 6.767310, gains=USD 5.475285, note=fee for transferring from Bitfinex to Coinbase
+1.1.2                      2017-12-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.039766780 originally purchased 2017-04-06 for USD 51.379689. proceeds=USD 436.460000, gains=USD 385.080311, note=sold BTC for USD
 
 === Capital Gains: ===
 1.1.1.spendCapitalGains.1	2017-11-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.001000000 originally purchased 2017-04-06 for USD 1.292025. proceeds=USD 6.767310, gains=USD 5.475285, note=fee for transferring from Bitfinex to Coinbase
-(2017's capital gains: short-term:$5.48 long-term:$0.00)
-(Total capital gains: short-term:$5.48 long-term:$0.00)
+1.1.2	2017-12-01 Taxable Gains (short-term) from sale on Bitfinex of BTC 0.039766780 originally purchased 2017-04-06 for USD 51.379689. proceeds=USD 436.460000, gains=USD 385.080311, note=sold BTC for USD
+(2017's capital gains: short-term:$390.56 long-term:$0.00)
+(Total capital gains: short-term:$390.56 long-term:$0.00)
 
 === Capital Gains, Tab-Separated (to copy into spreadsheet): ===
 lotName	year	account	currency	currencyAmount	origPurchaseDate	costBasis	saleDate	proceeds	term	gains	note
 1.1.1.spendCapitalGains.1	2017	Bitfinex	BTC	0.001000000	2017-04-06	1.29	2017-11-01	6.77	short	5.48	fee for transferring from Bitfinex to Coinbase
+1.1.2	2017	Bitfinex	BTC	0.039766780	2017-04-06	51.38	2017-12-01	436.46	short	385.08	sold BTC for USD
 
 === Account balances (and their lots): ===
-Bitfinex
-	BTC 0.039766780 (basis:51.379689	price:$1292.025388)
-		1.1  2017-04-06 Bitfinex BTC 0.039766780  (basis:$51.379689  price:$1292.025388)
 Coinbase
 	BTC 0.799000000 (basis:1039.095595	price:$1300.495113)
 		1.1.1  2017-04-06 Coinbase BTC 0.799000000  (basis:$1039.095595  price:$1300.495113)
-(Total basis: $1090.48)
+(Total basis: $1039.10)
 (Total initial investment: $1085.00)
 
 === Present Value, Tab-Separated (to copy into spreadsheet): ===
 lotName	account	currency	amount	costBasis	origPurchaseDate	daysSincePurchase	shortOrLongTerm	presentValue	unrealizedGainLoss	unrealizedGainLossPercent
-1.1	Bitfinex	BTC	0.039766780	51.38	2017-04-06	626	longTerm	160.22	108.84	211.8
 1.1.1	Coinbase	BTC	0.799000000	1039.10	2017-04-06	626	longTerm	3219.08	2179.99	209.8
 
 `))
@@ -187,6 +186,8 @@ func simpleScenario(w io.Writer) {
 
 	// transfer the BTC to another account, cost basis is preserved
 	l.Transfer(d("2017-11-01"), "1.1", BTC, 0.80000000, 0.001, Coinbase)
+
+	l.SellTaxable(d("2017-12-01"), "1.1", BTC, 0.039766780, 436.46)
 
 	//
 	// Print results
