@@ -8,6 +8,7 @@ import (
 	"time"
 
 	. "github.com/onsi/gomega"
+
 	"github.com/slatteryjim/cost-basis-tracking"
 )
 

@@ -174,10 +174,9 @@ func (l *Ledger) TransferMultipleLotsFully(date time.Time, fromLotNames []string
 //
 // I like this representation best, rather than introducing a "Pseudo Sale (USD)" lot, sullying the ancestry:
 //
-//         Starting Lot
-//           /     \
-//   Purchase Lot   Taxable Gain Lot
-//
+//	      Starting Lot
+//	        /     \
+//	Purchase Lot   Taxable Gain Lot
 func (l *Ledger) ExchangeTaxable(date time.Time, fromLotName string,
 	soldCurrency Currency, soldAmount, feeInSoldCurrency float64, lookupSoldCurrencyPriceForTaxableGains bool,
 	purchasedCurrency Currency, purchasedAmountReceived float64) *Lot {
@@ -305,10 +304,9 @@ func (l *Ledger) ExchangeTaxableMultipleLots(date time.Time, fromLotNames []stri
 //
 // I like this representation best, rather than introducing a "Pseudo Sale (USD)" lot, sullying the ancestry:
 //
-//         Starting Lot
-//           /     \
-//   Purchase Lot   Taxable Gain Lot
-//
+//	      Starting Lot
+//	        /     \
+//	Purchase Lot   Taxable Gain Lot
 func (l *Ledger) ExchangeNonTaxable(date time.Time, fromLotName string,
 	soldCurrency Currency, soldAmount, feeInSoldCurrency float64,
 	purchasedCurrency Currency, purchasedAmountReceived float64) {
@@ -407,8 +405,8 @@ func (l *Ledger) lookupPrice(currency Currency, date time.Time) float64 {
 
 // TotalInvestment simply looks at all of the "root" localCurrency nodes, summing up their original cost basis.
 // This may not be perfectly accurate, going forward:
-//  - Some money might still be sitting in that localCurrency lot, but not considered "invested"
-//  - Might start with non-localCurrency assets sometimes. Would need to account for them in localCurrency.
+//   - Some money might still be sitting in that localCurrency lot, but not considered "invested"
+//   - Might start with non-localCurrency assets sometimes. Would need to account for them in localCurrency.
 func (l *Ledger) TotalInvestment() float64 {
 	var totalInvestment float64
 	for _, lot := range l.lots {
