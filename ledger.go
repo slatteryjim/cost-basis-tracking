@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"text/tabwriter"
 	"time"
+
+	"github.com/samber/lo"
 )
 
 type (
@@ -478,10 +480,10 @@ func (l *Ledger) PrintTaxableGains() string {
 		}
 	}
 
-	var years []int
-	for y := range shortTermByYear {
-		years = append(years, y)
-	}
+	years := lo.Union(
+		lo.Keys(shortTermByYear),
+		lo.Keys(longTermByYear),
+	)
 	sort.Ints(years)
 	for _, y := range years {
 		fmt.Fprintf(b, "(%d's capital gains: short-term:$%.2f long-term:$%.2f)\n", y, shortTermByYear[y], longTermByYear[y])
