@@ -392,6 +392,9 @@ func (l *Ledger) nameLot() string {
 }
 
 func (l *Ledger) lookupPrice(currency Currency, date time.Time) float64 {
+	if currency == l.localCurrency {
+		return 1.0
+	}
 	prices, ok := l.historicalPrices[currency]
 	if !ok {
 		panic("Missing historical prices for " + currency.String())
