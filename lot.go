@@ -2,6 +2,7 @@ package ledger
 
 import (
 	"fmt"
+	"math"
 	"time"
 )
 
@@ -164,6 +165,14 @@ func (lot *Lot) Remove(currency Currency, amount float64) float64 {
 		panic("Lot does not contain " + currency.String() + "\n" + lot.String())
 	}
 
+	// We'll soon calculate percentageToRemove. But it behaves strangely for very small numbers.
+	// For instance, if the lot only has 0.00000001 and you try to remove that, it might have an issue
+	// because the lot actually has 0.00000001001, and the difference is large percentage-wise, but
+	// insignificant in terms of the actual amount.
+	// So let's first just round the amount if it matches the lot amount to within 9 decimal places.
+	if diff := math.Abs(amount - lot.amount); diff < 0.000000001 {
+		amount = lot.amount
+	}
 	percentageToRemove := amount / lot.amount
 	if RoundPlaces(percentageToRemove, 12) > 1.0 {
 		panic(fmt.Sprintf("Lot has less than the needed amount %f\n%s", amount, lot))
