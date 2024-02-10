@@ -14,6 +14,12 @@ import (
 	"github.com/samber/lo"
 )
 
+// InsignificantAmount is close enough to zero to call it zero.
+// A lot of floating point operations will end up with a number that is
+// basically zero, but with some cruft after 12 or more decimal places.
+// We can use this constant to compare to "zero", for practical purposes.
+const InsignificantAmount = 1e-13
+
 type (
 	// Ledger lets you record financial activity, tracking cost basis lots.
 	Ledger struct {
@@ -120,7 +126,7 @@ func (l *Ledger) TransferMultipleLots(date time.Time, fromLotNames []string, cur
 	// find the given lots
 	for _, name := range fromLotNames {
 		lot := l.FindLotByName(name, currency)
-		if remainingToTransfer <= 0 {
+		if remainingToTransfer <= InsignificantAmount {
 			panic("There's nothing left to remove from this lot: " + lot.String())
 		}
 
@@ -134,9 +140,9 @@ func (l *Ledger) TransferMultipleLots(date time.Time, fromLotNames []string, cur
 		newLots = append(newLots, newLot)
 	}
 
-	if remainingToTransfer > 0 {
+	if remainingToTransfer > InsignificantAmount {
 		panic(fmt.Sprintf("Insufficient funds in the lots. Remaining: %.9f", remainingToTransfer))
-	} else if remainingToTransfer < 0 {
+	} else if remainingToTransfer < -InsignificantAmount {
 		panic(fmt.Sprintf("Too much funds transferred! Remaining: %.9f", remainingToTransfer))
 	}
 
@@ -157,7 +163,7 @@ func (l *Ledger) TransferMultipleLotsFully(date time.Time, fromLotNames []string
 		lotsTotal += lots[i].amount
 	}
 
-	if math.Abs(lotsTotal-amountRemoved) > 0.0000000000001 {
+	if math.Abs(lotsTotal-amountRemoved) > InsignificantAmount {
 		panic(fmt.Sprintf("Amount to remove %0.10f does not match the amount in the lots %0.10f (diff: %0.20f)", amountRemoved, lotsTotal, amountRemoved-lotsTotal))
 	}
 
@@ -241,7 +247,7 @@ func (l *Ledger) Spend(date time.Time, feeWasFromAccount Account, fromLotName st
 	soldCurrency Currency, soldAmount float64, note string) float64 {
 
 	// nothing to do if amount is zero
-	if soldAmount == 0 {
+	if math.Abs(soldAmount) < InsignificantAmount {
 		return 0
 	}
 
@@ -254,7 +260,7 @@ func (l *Ledger) Spend(date time.Time, feeWasFromAccount Account, fromLotName st
 
 	// create taxable gains lot
 	gains := valueInLocalCurrency - soldCostBasis
-	if gains != 0 {
+	if math.Abs(gains) > InsignificantAmount {
 		// Terrible hack here..
 		// Temporarily doing something special with the lot naming here... don't want to modify the parent lot numbering,
 		// since that will muck up some existing accounting before this Spend() behavior was added.
@@ -308,10 +314,10 @@ func (l *Ledger) ExchangeTaxableMultipleLots(date time.Time, fromLotNames []stri
 	// find the given lots
 	for _, name := range fromLotNames {
 		lot := l.FindLotByName(name, soldCurrency)
-		if remainingToSell <= 0 {
+		if remainingToSell <= InsignificantAmount {
 			panic("There's nothing left to sell from this lot: " + lot.String())
 		}
-		if remainingToPurchase <= 0 {
+		if remainingToPurchase <= InsignificantAmount {
 			panic("There's nothing left to purchase")
 		}
 
@@ -577,7 +583,7 @@ func (l *Ledger) AccountSummary() map[Account]map[Currency]*Summary {
 		accounts = map[Account]map[Currency]*Summary{}
 	)
 	for _, lot := range l.lots {
-		if lot.amount > 0 && lot.lotType != TaxableGains {
+		if lot.amount > InsignificantAmount && lot.lotType != TaxableGains {
 			currencyToSummary, ok := accounts[lot.account]
 			if !ok {
 				currencyToSummary = map[Currency]*Summary{}
@@ -607,7 +613,7 @@ func (l *Ledger) PrintPresentValueTSV(now time.Time, currentPrices map[Currency]
 	c.Write([]string{"lotName", "account", "currency", "amount", "costBasis", "origPurchaseDate",
 		"daysSincePurchase", "shortOrLongTerm", "presentValue", "unrealizedGainLoss", "unrealizedGainLossPercent"})
 	for _, lot := range l.lots {
-		if lot.amount > 0 && lot.lotType != TaxableGains {
+		if lot.amount > InsignificantAmount && lot.lotType != TaxableGains {
 			daysSincePurchase := now.Sub(lot.originalPurchaseTime) / (24 * time.Hour)
 			shortOrLongTerm := "longTerm"
 			if daysSincePurchase < 365 {
